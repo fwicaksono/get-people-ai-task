@@ -38,7 +38,7 @@ def render_sidebar():
         
         st.divider()
         st.header("2. Job Details (Context)")
-        st.info("Tadd more details to sharpen the AI Profile results.")
+        st.info("add more details to sharpen the AI Profile results.")
         
         with st.expander("Key Responsibilities"):
             resps = manage_list_input("Responsibility", "resp")
