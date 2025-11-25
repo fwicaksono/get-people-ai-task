@@ -186,7 +186,7 @@ def render_results_table(df):
     top_df = df.head(10)
 
     # --- TABEL 1: RANKING (SCORING) ---
-    st.markdown("###Ranked Talent List")
+    st.markdown("### Ranked Talent List")
     
     score_cols = ["employee_id", "fullname", "final_match_rate", "top_tgv", "gap_tgv", "strengths_list"]
     st.dataframe(
@@ -206,7 +206,7 @@ def render_results_table(df):
     st.divider()
 
     # --- TABEL 2: INFO (DEMOGRAPHICS) ---
-    st.markdown("###Employee Information")
+    st.markdown("### Employee Information")
     
     info_cols = ["fullname", "final_match_rate", "role", "division", "department", "job_level"]
     available_cols = [c for c in info_cols if c in top_df.columns]
@@ -215,7 +215,7 @@ def render_results_table(df):
     st.divider()
 
     # --- TABEL 3: DETAILED PARAMETERS (FULL RAW DATA) ---
-    st.markdown("### 🔬 Detailed Scoring Parameters")
+    st.markdown("### Detailed Scoring Parameters")
     st.caption("Displaying data for the top 10 candidates.")
     
     st.dataframe(
