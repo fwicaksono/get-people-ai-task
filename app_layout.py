@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 
 def manage_list_input(label, key_prefix):
     """Helper function untuk membuat input list Add/Remove"""
@@ -38,7 +39,7 @@ def render_sidebar():
         
         st.divider()
         st.header("2. Job Details (Context)")
-        st.info("add more details to sharpen the AI Profile results.")
+        st.info("Tadd more details to sharpen the AI Profile results.")
         
         with st.expander("Key Responsibilities"):
             resps = manage_list_input("Responsibility", "resp")
@@ -59,7 +60,7 @@ def render_sidebar():
 
 def render_visualizations(df, best_candidate):
     
-    st.markdown("###Talent Intelligence Dashboard")
+    st.markdown("### Talent Intelligence Dashboard")
 
     with st.expander("🎯 Active Benchmark Target (The '100%' Standard)", expanded=True):
         col_b1, col_b2, col_b3 = st.columns(3)
@@ -75,10 +76,33 @@ def render_visualizations(df, best_candidate):
         
         st.caption("*These values are dynamically calculated from your selected Benchmark IDs.*")
 
-    # Grafik Distribusi
-    with st.expander("Match Rate Distribution", expanded=False):
-        fig_dist = px.histogram(df, x="final_match_rate", nbins=20, title="Distribution of Candidate Match Rates", labels={'final_match_rate': 'Match Rate (%)'}, color_discrete_sequence=['#636EFA'])
-        fig_dist.add_vline(x=best_candidate['final_match_rate'], line_dash="dash", line_color="red", annotation_text="Top Pick")
+
+    with st.expander("📈 Match Rate Distribution", expanded=False):
+        # 1. Hitung Histogram Manual agar bisa dikasih warna beda-beda
+        counts, bin_edges = np.histogram(df['final_match_rate'], bins=15)
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+        
+        # 2. Buat DataFrame Sementara
+        hist_df = pd.DataFrame({
+            'Match Rate': bin_centers,
+            'Count': counts
+        })
+        
+        # 3. Plot menggunakan Bar Chart (bukan Histogram standar) agar support color scale
+        fig_dist = px.bar(
+            hist_df, 
+            x='Match Rate', 
+            y='Count', 
+            color='Match Rate',  # Ini kuncinya: Warna berdasarkan skor (X-axis)
+            title="Distribution of Candidate Match Rates",
+            labels={'Match Rate': 'Match Rate (%)', 'Count': 'Number of Candidates'},
+            color_continuous_scale='Viridis', # Pilihan warna: Viridis, Plasma, Inferno, Cividis, Tealgrn
+        )
+        
+        # Tweak visual: Hilangkan gap berlebih, tambah garis kandidat
+        fig_dist.update_layout(bargap=0.05, coloraxis_showscale=False) # Sembunyikan colorbar agar bersih
+        fig_dist.add_vline(x=best_candidate['final_match_rate'], line_dash="dash", line_color="#FF4B4B", annotation_text="Top Pick")
+        
         st.plotly_chart(fig_dist, use_container_width=True)
 
     col1, col2 = st.columns(2)
@@ -103,7 +127,7 @@ def render_visualizations(df, best_candidate):
                 )
             ), 
             showlegend=True, 
-            margin=dict(t=20, b=20, l=40, r=40)
+            margin=dict(t=20, b=20, l=65, r=30)
         )
         st.plotly_chart(fig_radar, use_container_width=True)
 
